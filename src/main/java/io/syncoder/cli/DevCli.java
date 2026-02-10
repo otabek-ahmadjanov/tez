@@ -4,15 +4,15 @@ import io.syncoder.commands.VersionCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-
-@Command(
-        name = "tez",
-        description = "Tez CLI",
-        mixinStandardHelpOptions = true // -h, --help
-)
+@Command(name = "tez", description = "Tez CLI", subcommands = {
+        VersionCommand.class // Добавляем подкоманды если есть
+})
 public class DevCli implements Runnable {
 
-     @Option(names = {"-v", "--version"}, description = "Print version and exit")
+    @Option(names = {"-h", "--help"}, usageHelp = true, description = "Show help message")
+    boolean help;
+
+    @Option(names = {"-v", "--version"}, description = "Print version and exit")
     boolean version;
 
     @Override
