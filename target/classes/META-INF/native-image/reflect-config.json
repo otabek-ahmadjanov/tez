@@ -1,0 +1,17 @@
+[
+  {
+    "name": "com.fasterxml.jackson.databind.ext.Java7SupportImpl",
+    "methods": [{"name": "<init>", "parameterTypes": []}]
+  },
+  {
+    "name": "com.fasterxml.jackson.databind.ext.Java7Handlers",
+    "methods": [{"name": "<init>", "parameterTypes": []}]
+  },
+  {
+    "name": "dev.ghgl.MainCommand",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true
+  }
+]

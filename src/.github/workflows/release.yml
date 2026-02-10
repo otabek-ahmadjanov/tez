@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-release:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset_name: tez-linux-amd64
+          - os: macos-latest
+            asset_name: tez-macos-amd64
+          - os: windows-latest
+            asset_name: tez-windows-amd64.exe
+    
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '17'
+          distribution: 'graalvm'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      
+      - name: Build with Maven
+        run: mvn clean package -B
+      
+      - name: Build Native Image
+        run: mvn -Pnative native:compile
+      
+      - name: Rename binary (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: mv target/tez target/${{ matrix.asset_name }}
+      
+      - name: Rename binary (Windows)
+        if: runner.os == 'Windows'
+        run: move target\tez.exe target\${{ matrix.asset_name }}
+      
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./target/${{ matrix.asset_name }}
+          asset_name: ${{ matrix.asset_name }}
+          asset_content_type: application/octet-stream
